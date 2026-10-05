@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'gurumapel_dashboard.dart';
+import '../services/api_service.dart';
 import 'walikelas_dashboard.dart';
-// Pastikan fitur_view.dart sudah ada, jika belum silakan buat file fitur_view.dart
-import 'fitur_view.dart'; 
+import 'gurumapel_dashboard.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -12,60 +11,94 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final _userController = TextEditingController();
+  final _passController = TextEditingController();
+  bool isLoading = false;
 
-  void _login() {
-    String username = _usernameController.text.trim();
-    
-    // Contoh navigasi berdasarkan input atau uji coba
-    if (username.toLowerCase().contains('wali')) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const WaliKelasDashboard(
-            namaGuru: 'Bapak Guru Wali',
-            kodeLembaga: 'SD-ZAHA',
+  void _prosesLogin() async {
+    setState(() => isLoading = true);
+    var res = await ApiService.login(_userController.text, _passController.text);
+    setState(() => isLoading = false);
+
+    if (res['status'] == 'success') {
+      // Mengubah role ke huruf kecil agar aman dari perbedaan kapitalisasi spreadsheet
+      String role = (res['role'] ?? '').toString().trim().toLowerCase();
+      String nama = res['nama_lengkap'] ?? '';
+      String lembaga = res['kode_lembaga'] ?? '';
+      String kelasGuru = res['kelas'] ?? ''; // Mengambil ID Kelas dari kolom F Google Sheets
+      String mapelGuru = res['mata_pelajaran'] ?? ''; // Mengambil Mata Pelajaran dari kolom G Google Sheets
+
+      // Cek apakah role mengandung kata wali atau walikelas
+      if (role.contains('wali')) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => WaliKelasDashboard(
+              namaGuru: nama, 
+              kodeLembaga: lembaga, 
+              kelasGuru: kelasGuru, // Meneruskan kelas ke dashboard wali kelas
+            ),
           ),
-        ),
-      );
+        );
+      } else {
+        // Jika bukan wali kelas, arahkan ke guru mapel
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => GuruMapelDashboard(
+              namaGuru: nama, 
+              kodeLembaga: lembaga,
+              mapelGuru: mapelGuru,
+            ),
+          ),
+        );
+      }
     } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const GuruMapelDashboard(
-            namaGuru: 'Bapak Guru Mapel',
-            kodeLembaga: 'SD-ZAHA',
-          ),
-        ),
-      );
+      _showMsg(res['message'] ?? "Login Gagal");
     }
+  }
+
+  void _showMsg(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login EduMaster')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _usernameController,
-              decoration: const InputDecoration(labelText: 'Username'),
+      backgroundColor: Colors.grey.shade100,
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.school_rounded, size: 70, color: Colors.blueAccent),
+                  const SizedBox(height: 12),
+                  const Text("EduMaster", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blueAccent)),
+                  const Text("Portal Administrasi Guru & Wali Kelas", style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  const SizedBox(height: 24),
+                  TextField(controller: _userController, decoration: const InputDecoration(labelText: 'Username', border: OutlineInputBorder())),
+                  const SizedBox(height: 16),
+                  TextField(controller: _passController, decoration: const InputDecoration(labelText: 'Password', border: OutlineInputBorder()), obscureText: true),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent, foregroundColor: Colors.white),
+                      onPressed: isLoading ? null : _prosesLogin,
+                      child: isLoading ? const CircularProgressIndicator(color: Colors.white) : const Text('MASUK APLIKASI', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _login,
-              child: const Text('Login'),
-            ),
-          ],
+          ),
         ),
       ),
     );

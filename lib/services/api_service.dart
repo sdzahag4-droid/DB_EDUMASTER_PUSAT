@@ -17,9 +17,17 @@ class ApiService {
     }
   }
 
-  static Future<List<dynamic>> getData(String sheetName, String kodeLembaga) async {
+  // Menambahkan parameter opsional kelas untuk memfilter data siswa
+  static Future<List<dynamic>> getData(String sheetName, String kodeLembaga, {String? pemberi, String? kelas}) async {
     try {
-      final response = await http.get(Uri.parse("$url?sheet=$sheetName&lembaga=$kodeLembaga"));
+      String queryUrl = "$url?sheet=$sheetName&lembaga=$kodeLembaga";
+      if (pemberi != null && pemberi.isNotEmpty) {
+        queryUrl += "&pemberi=$pemberi";
+      }
+      if (kelas != null && kelas.isNotEmpty) {
+        queryUrl += "&kelas=$kelas";
+      }
+      final response = await http.get(Uri.parse(queryUrl));
       return jsonDecode(response.body);
     } catch (e) {
       return [];

@@ -5,21 +5,28 @@ import 'login_view.dart';
 class GuruMapelDashboard extends StatelessWidget {
   final String namaGuru;
   final String kodeLembaga;
-  const GuruMapelDashboard({super.key, required this.namaGuru, required this.kodeLembaga});
+  final String mapelGuru; // Menambahkan parameter mapelGuru
+
+  const GuruMapelDashboard({
+    super.key,
+    required this.namaGuru,
+    required this.kodeLembaga,
+    required this.mapelGuru,
+  });
 
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> menuMapel = [
-      {"title": "Absen Harian Mapel", "icon": Icons.event_available, "type": "absen", "kategori": "GuruMapel"},
-      {"title": "Rekap Absen Mapel", "icon": Icons.bar_chart, "type": "rekap", "kategori": "GuruMapel"},
-      {"title": "Input Nilai Mapel", "icon": Icons.assignment, "type": "nilai", "kategori": "GuruMapel"},
-      {"title": "Data Siswa", "icon": Icons.people, "type": "siswa", "kategori": "GuruMapel"},
-      {"title": "Catatan Guru Mapel", "icon": Icons.edit_note, "type": "catatan", "kategori": "GuruMapel"},
+      {"title": "Absen Harian Mapel", "icon": Icons.event_available, "type": "absen", "kategori": mapelGuru},
+      {"title": "Rekap Absen Mapel", "icon": Icons.bar_chart, "type": "rekap", "kategori": mapelGuru},
+      {"title": "Input Nilai Mapel", "icon": Icons.assignment, "type": "nilai", "kategori": mapelGuru},
+      {"title": "Data Siswa", "icon": Icons.people, "type": "siswa", "kategori": mapelGuru},
+      {"title": "Catatan Guru Mapel", "icon": Icons.edit_note, "type": "catatan", "kategori": mapelGuru},
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard Guru Mapel'),
+        title: Text('Dashboard Guru Mapel - $mapelGuru'),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
         actions: [
@@ -39,7 +46,7 @@ class GuruMapelDashboard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Guru Mapel: $namaGuru", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text("Guru Mapel: $namaGuru ($mapelGuru)", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 Text("Lembaga: $kodeLembaga", style: const TextStyle(fontSize: 12, color: Colors.grey)),
               ],
             ),
@@ -62,6 +69,7 @@ class GuruMapelDashboard extends StatelessWidget {
                           kategoriPengajar: m['kategori'],
                           namaPengajar: namaGuru,
                           kodeLembaga: kodeLembaga,
+                          kelasGuru: "-", // Guru mapel tidak terikat satu kelas khusus wali kelas
                         ),
                       ),
                     );

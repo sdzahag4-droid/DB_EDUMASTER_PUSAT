@@ -5,7 +5,14 @@ import 'login_view.dart';
 class WaliKelasDashboard extends StatelessWidget {
   final String namaGuru;
   final String kodeLembaga;
-  const WaliKelasDashboard({super.key, required this.namaGuru, required this.kodeLembaga});
+  final String kelasGuru; // Menambahkan parameter kelasGuru
+
+  const WaliKelasDashboard({
+    super.key,
+    required this.namaGuru,
+    required this.kodeLembaga,
+    required this.kelasGuru,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +26,7 @@ class WaliKelasDashboard extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard Wali Kelas'),
+        title: Text('Dashboard Wali Kelas - Kelas $kelasGuru'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
         actions: [
@@ -40,7 +47,7 @@ class WaliKelasDashboard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("Wali Kelas: $namaGuru", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                Text("Lembaga: $kodeLembaga", style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                Text("Kelas: $kelasGuru | Lembaga: $kodeLembaga", style: const TextStyle(fontSize: 12, color: Colors.grey)),
               ],
             ),
           ),
@@ -62,6 +69,7 @@ class WaliKelasDashboard extends StatelessWidget {
                           kategoriPengajar: m['kategori'],
                           namaPengajar: namaGuru,
                           kodeLembaga: kodeLembaga,
+                          kelasGuru: kelasGuru, // Diteruskan ke FiturView
                         ),
                       ),
                     );
