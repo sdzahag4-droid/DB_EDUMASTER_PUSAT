@@ -5,7 +5,7 @@ import 'login_view.dart';
 class WaliKelasDashboard extends StatelessWidget {
   final String namaGuru;
   final String kodeLembaga;
-  final String kelasGuru; // Menambahkan parameter kelasGuru
+  final String kelasGuru;
 
   const WaliKelasDashboard({
     super.key,
@@ -69,7 +69,8 @@ class WaliKelasDashboard extends StatelessWidget {
                           kategoriPengajar: m['kategori'],
                           namaPengajar: namaGuru,
                           kodeLembaga: kodeLembaga,
-                          kelasGuru: kelasGuru, // Diteruskan ke FiturView
+                          kelasWali: kelasGuru, // Diubah dari kelasGuru ke kelasWali
+                          listSiswa: const [],
                         ),
                       ),
                     );

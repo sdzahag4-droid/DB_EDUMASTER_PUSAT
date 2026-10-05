@@ -21,14 +21,14 @@ class _LoginViewState extends State<LoginView> {
     setState(() => isLoading = false);
 
     if (res['status'] == 'success') {
-      // Mengubah role ke huruf kecil agar aman dari perbedaan kapitalisasi spreadsheet
       String role = (res['role'] ?? '').toString().trim().toLowerCase();
       String nama = res['nama_lengkap'] ?? '';
       String lembaga = res['kode_lembaga'] ?? '';
-      String kelasGuru = res['kelas'] ?? ''; // Mengambil ID Kelas dari kolom F Google Sheets
-      String mapelGuru = res['mata_pelajaran'] ?? ''; // Mengambil Mata Pelajaran dari kolom G Google Sheets
+      
+      // PERBAIKAN: Menangkap berbagai kemungkinan penamaan key dari Google Apps Script untuk ID Kelas
+      String kelasGuru = (res['id_kelas'] ?? res['ID Kelas'] ?? res['ID_Kelas'] ?? res['kelas'] ?? '').toString().trim();
+      String mapelGuru = (res['mata_pelajaran'] ?? res['Mata Pelajaran'] ?? '').toString().trim();
 
-      // Cek apakah role mengandung kata wali atau walikelas
       if (role.contains('wali')) {
         Navigator.pushReplacement(
           context,
@@ -36,12 +36,11 @@ class _LoginViewState extends State<LoginView> {
             builder: (_) => WaliKelasDashboard(
               namaGuru: nama, 
               kodeLembaga: lembaga, 
-              kelasGuru: kelasGuru, // Meneruskan kelas ke dashboard wali kelas
+              kelasGuru: kelasGuru, // Mengirimkan kelas yang benar (misal: 5A)
             ),
           ),
         );
       } else {
-        // Jika bukan wali kelas, arahkan ke guru mapel
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
